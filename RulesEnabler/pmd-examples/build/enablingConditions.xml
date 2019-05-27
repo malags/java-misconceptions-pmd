@@ -1,0 +1,800 @@
+<?xml version="1.0"?>
+
+<ruleset name="PF2 misconceptions enabler"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        Rule to verify whether a misconception could be triggered by some code.
+    </description>
+
+
+
+    <rule name="EnablerNoFloatLiterals"
+          language="java"
+          message="Check whether NoFloatLiterals could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          >
+        <description>
+Use float literal instead of casting a literal to float
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//BlockStatement[
+./Statement/StatementExpression[pmd-java:typeIs('float')]//AssignmentOperator
+or
+.//LocalVariableDeclaration/Type/PrimitiveType[@Image='float']
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+  public class Foo {
+    public void bar() {
+        float f = (float) 123;
+        f = (float) 23;
+        f = (float) (1.5);
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerNoLongLiterals"
+          language="java"
+          message="Check whether NoLongLiterals could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+Use long literal instead of casting a literal to long
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//BlockStatement[
+./Statement/StatementExpression[pmd-java:typeIs('long')]//AssignmentOperator
+or
+.//LocalVariableDeclaration/Type/PrimitiveType[@Image='long']
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+  public class Foo {
+    public void bar() {
+        long l = (long) 123;
+        l = (long) 23;
+        l = (long) (12);
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerMapToBooleanWithConditionalOperator"
+          language="java"
+          message="Check whether MapToBooleanWithConditionalOperator could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+The value from the ternary operator is redundant.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ConditionalExpression
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+  public void bar() {
+      boolean t1 = a ? true : false;
+      boolean t2 = a ? false : true;
+      boolean t3 = foo() ? false : true;
+
+      if(foo() ? false : true){
+        //do something
+      }
+  }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerComparisonWithBooleanLiteral"
+          language="java"
+          message="Check whether ComparisonWithBooleanLiteral could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+Comparisons with boolean literals are unnecessary.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//EqualityExpression
+|
+//RelationalExpression
+|
+//ExclusiveOrExpression
+|
+//ConditionalOrExpression
+|
+//ConditionalAndExpression
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+  public void bar() {
+    boolean bool = true;
+
+    //unnecessary comparison with true
+    if(bool == true){
+      //do something
+    }
+
+    //unnecessary comparison with false
+    if(bool != false){
+      //do something
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerMapToBooleanWithIf"
+          language="java"
+          message="Check whether MapToBooleanWithIf could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+Utilise the value of a boolean expression if possible.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//IfStatement[.//BooleanLiteral]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+
+  public boolean bar() {
+    if(false)
+      return false;
+    if(false){
+      return true;
+    }
+    //...
+  }
+
+  public Foo foo(){
+
+    if(false)
+      return new Foo(false);
+
+    if(false){
+      return new Foo(true);
+    }
+
+    //...
+  }
+
+  public Foo foo2(boolean s){
+
+    boolean b;
+    if(!s){
+      b = false;
+    }
+    else{
+      b = true;
+    }
+
+    //...
+  }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerCharNotNumeric"
+          language="java"
+          message="Check whether CharNotNumeric could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+A char can be utilised as if it were a number.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//Literal[@CharLiteral = true()]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+    <![CDATA[
+public class Foo {
+    public boolean bar() {
+
+      char c = (char) (( (int)'a' ) +2);
+
+      int i = (int) 'i';
+
+    }
+}
+    ]]>
+        </example>
+    </rule>
+
+
+<!-- only with pmd:check, compilation fails otherwise-->
+    <rule name="EnablerLargeIntegerLong"
+          language="java"
+          message="Check whether LargeIntegerLong could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+A large integer literal bigger than 32bit is not a Long
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<!-- doesn't cover all cases as it's not possible with XPath -->
+<![CDATA[
+//LocalVariableDeclaration[
+./Type/PrimitiveType[@Image='long']
+and
+.//PrimaryPrefix/Literal[@IntLiteral = true()]
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public boolean bar() {
+        long i = 1234567876543245678;
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerReturnCall"
+          language="java"
+          message="Check whether ReturnCall could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+The return statement does not need parenthesis as it is NOT a method.
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//MethodDeclaration[@Void = false()]//ReturnStatement
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public boolean bar() {
+        return (true);
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerArrayListIsArray"
+          language="java"
+          message="Check whether ArrayListIsArray could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+An ArrayList is NOT an array, it is not possible to initialise an ArrayList with an Array.
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//LocalVariableDeclaration[
+  ./Type[@TypeImage='ArrayList']
+  or
+  ./Type[@ArrayType = true()]/ReferenceType
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+import java.util.ArrayList;
+public class Foo {
+    public void bar() {
+       ArrayList<Integer> asd = new Integer[3];
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerArrayBracketForEachElement"
+          language="java"
+          message="Check whether ArrayBracketForEachElement could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+Brackets in array initializations are used to set the size not the value, suspicious number of brackets detected.
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//AllocationExpression/ArrayDimsAndInits
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public void bar() {
+        int [] a = new int[1][2][3][4][5];
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerIfRequiresElse"
+          language="java"
+          message="Check whether rule IfRequiresElse could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+An if statement doesn't require an else statement but can be utilised alone.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//IfStatement[count(./Statement) = 2][not(./Statement/IfStatement)]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Example{
+
+  int count = 0;
+
+  private void violation1(int v){
+    if (v > 0) {
+      count = count + 1;
+    }
+    else {
+      // else branch is not necessary
+      count = count;
+    }
+  }
+
+  private void violation2(){
+    if (v==value) {
+      count = count + 1;
+    }
+    else {
+      // else branch is not necessary
+    }
+  }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerThisExistsInStaticMethod"
+          language="java"
+          message="Check whether rule ThisExistsInStaticMethod could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+The keyword this doesn't exist in a static method.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//MethodDeclaration[@Static = true()]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Example {
+
+  public int key = 0;
+
+  public static int violation() {
+    return this.key;    //violation
+  }
+
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerDeferredReturn"
+          language="java"
+          message="Check whether DeferredReturn could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+When a return statement is reached it immediately return unless inside a try in a
+try{}catch(){}finally{}.
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ReturnStatement
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public boolean bar() {
+        return true;
+        boolean b = true;
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+    <rule name="EnablerArrayElementsUntyped"
+          language="java"
+          message="Check whether ArrayElementsUntyped could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+The values stored inside an array must be of the same type as the array containing them,
+or they must be a subclass or a class implementing the type.
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//StatementExpression[
+  ./AssignmentOperator
+  and
+  ./PrimaryExpression/PrimarySuffix/Expression
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Example {
+
+  void ex(){
+    int[] a = new int[3];
+    a[0] = "Hi"; // type error
+    a[1] = 12;
+    a[2] = 13.5; // type error
+  }
+
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerLocalVariablesAutoInitialized"
+          language="java"
+          message="Check whether LocalVariablesAutoInitialized could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+A local variable must be initialised before utilisation as they, unlike fields,
+don't have a default value.
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+    <![CDATA[
+    //StatementExpression[
+    ./AssignmentOperator
+    and
+    ./PrimaryExpression/PrimarySuffix
+    ]
+    ]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+    <![CDATA[
+    public class Example {
+
+    void ex(){
+    int[] a = new int[3];
+    a[0] = "Hi"; // type error
+    a[1] = 12;
+    a[2] = 13.5; // type error
+    }
+
+    }
+    ]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerForEachVariableIsElement"
+          language="java"
+          message="Check whether ForEachVariableIsElement could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+The variable of a for-each statement can be seen as a new variable to which it's
+assigned the value currently in the collection, it's therefore a distinct variable
+not an alias for the variable holding the element.
+
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//LocalVariableDeclaration[
+    ./Type[@TypeImage = 'List' or @TypeImage = 'ArrayList']
+  or
+    @Array = true()
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    int i = 0;
+    public int bar() {
+      Foo[] foos = new Foo[10];
+      for (Foo foo : foos) {
+        foo = new Foo();        //violation
+      }
+
+      int[] ages = new int[10];
+      for (int age : ages) {
+        age = 19;               //violation
+      }
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerObjectsMustBeNamed"
+          language="java"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          message="Check whether the rule ObjectsMustBeNamed could detect a violation.">
+        <description>
+It is possible to use newly instantiated objects directy without assigning them to a variable.
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//MethodDeclaration/Block//VariableDeclaratorId[not(ancestor::ForInit)][not (
+    pmd-java:typeIs('byte')
+ or pmd-java:typeIs('short')
+ or pmd-java:typeIs('int')
+ or pmd-java:typeIs('long')
+ or pmd-java:typeIs('float')
+ or pmd-java:typeIs('double')
+ or pmd-java:typeIs('char')
+ or pmd-java:typeIs('boolean'))]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public void doSomething() {
+      String foo = new String();
+      foo.length();
+      //foo never used again.
+    }
+]]>
+        </example>
+    </rule>
+
+
+    <rule name="EnablerStringLiteralNoObject"
+      language="java"
+      message="Check whether the rule StringLiteralNoObject could detect a violation."
+      class="net.sourceforge.pmd.lang.rule.XPathRule">
+    <description>
+Directly utilise the String literal instead of passing it as an argument to a String constructor.
+    </description>
+    <priority>3</priority>
+    <properties>
+        <property name="xpath">
+            <value>
+<![CDATA[
+//BlockStatement[not(.//Block)][
+    ./LocalVariableDeclaration/Type[pmd-java:typeIs('java.lang.String')]
+  or
+    .//StatementExpression[
+        ./AssignmentOperator
+      and
+        ./Expression//Literal[pmd-java:typeIs('java.lang.String')]
+    ]/PrimaryExpression/PrimaryPrefix/Name[pmd-java:typeIs('java.lang.String')]
+]
+]]>
+            </value>
+        </property>
+        <property name="version" value="2.0"/>
+    </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public boolean bar() {
+
+      String s = new String("Hello World");
+
+      s = new String("Hello Again");
+      new String("This too.");
+
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerVariableHoldExpression"
+          language="java"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          message="Check whether the rule VariableHoldExpression could detect a violation.">
+        <description>
+A variable holds the value of the evaluated expression used in the assignment, not
+the expression.
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//BlockStatement/LocalVariableDeclaration//VariableDeclaratorId[
+    pmd-java:typeIs('byte')
+ or pmd-java:typeIs('short')
+ or pmd-java:typeIs('int')
+ or pmd-java:typeIs('long')
+ or pmd-java:typeIs('float')
+ or pmd-java:typeIs('double')
+ or pmd-java:typeIs('char')
+ or pmd-java:typeIs('boolean')]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public double doSomething(int v) {
+      double foo = v/2;
+      return foo;
+    }
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerDivisionToFractional"
+          language="java"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          message="Check whether the rule DivisionToFractional could detect a violation.">
+        <description>
+A division between two integers produces an integer. i.e. 1/2 == 0
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//MultiplicativeExpression[@Image='/'][
+count(.//Literal[@IntLiteral = true()]) = 2
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public void doSomething() {
+      int notADouble = 12/3;
+      notADouble = 3/2;
+    }
+]]>
+        </example>
+    </rule>
+
+
+</ruleset>

@@ -9,8 +9,11 @@ import os
 #Path of file
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-org='usi-pf2-2019'
-pmd_pos = '/pmd-bin-6.14.0/bin'
+#TODO: insert correct org name
+org='YOUR_ORG_NAME_HERE'
+
+
+pmd_pos = dir_path + '/pmd-bin-6.14.0/bin'
 pos_yaclu = dir_path+ '/yaclu'
 root = dir_path+ '/student-repos'
 pos_classroom_sh = dir_path+ '/classroom-util'
@@ -49,7 +52,7 @@ def run_pmd_check(root,folders):
         else:
             jar = '/RulesEnabler/pmd-examples/pf2_custom_rules_enabler.jar'
             en = 'enablerV'
-        subprocess.run('cd ' + root + '/ ;CLASSPATH=' + pos_root + jar +' ' + pmd_pos +'/run.sh pmd -no-cache -f csv -d ' + folder + ' -R myrule.xml -t 8 | grep -v "Test.java" | tee '+root+'/'+folder+ '/' + en + 'iolation.csv >> violation.csv', shell=True);
+        subprocess.run('cd ' + root + '/ ;CLASSPATH=' + dir_path + jar +' ' + pmd_pos +'/run.sh pmd -no-cache -f csv -d ' + folder + ' -R myrule.xml -t 8 | grep -v "Test.java" | tee '+root+'/'+folder+ '/' + en + 'iolation.csv >> violation.csv', shell=True);
 
 def run_pmd_output(root,folders,command):
     out = {};

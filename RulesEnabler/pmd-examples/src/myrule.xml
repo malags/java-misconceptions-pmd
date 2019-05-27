@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+
+<ruleset name="PF2 Java Rules"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <description>
+Common misconceptions found in the pf2 course, or in general in novice programmers. Java rules only.
+    </description>
+
+
+
+    <rule name="EnablerRecursiveCallSiteNoReturn"
+          language="java"
+          class="EnablerRecursiveCallSiteNoReturn"
+          message="Check whether the rule RecursiveCallSiteNoReturn could detect a violation.">
+        <description>
+A recursive method that has a non-void type always requires at least two return statements as it must always return a value.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public int factorial(int n) {
+      if(n <= 1){
+          return 1;
+      }
+      factorial(n-1);
+    }
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="EnablerCharNotNumeric"
+          language="java"
+          message="Check whether CharNotNumeric could detect a violation."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+A char can be utilised as if it were a number.
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//Literal[@CharLiteral = true()]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+    <![CDATA[
+public class Foo {
+    public boolean bar() {
+
+      char c = (char) (( (int)'a' ) +2);
+
+      int i = (int) 'i';
+
+    }
+}
+    ]]>
+        </example>
+    </rule>
+
+
+
+<rule name="EnablerPrivateFromOtherInstance"
+      language="java"
+      class="EnablerPrivateFromOtherInstance"
+      message="Check whether the rule EnablerPrivateFromOtherInstance could detect a violation.">
+    <description>
+Instances of the same class can access each other private fields.
+    </description>
+    <priority>3</priority>
+    <example>
+<![CDATA[
+public class Example {
+
+private int key;
+
+public int getKey(){
+return key;
+}
+
+public boolean violation(C other) {
+return this.key == other.getKey();
+}
+
+}
+]]>
+    </example>
+</rule>
+
+
+
+    <rule ref="enablingConditions.xml"/>
+
+</ruleset>
