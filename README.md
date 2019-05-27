@@ -39,7 +39,7 @@ mkdir student-repos
 # Requirements
 For `run.py` to work there are several requirements:
 * A Github organisation (for clone and pull functionality)
-* The students repos must be named with the scheme :lab-[0-9]+-  (i.e. lab-01-example is a repo for lab01)
+* The students repos must be named with the scheme `lab-[0-9]+-` (i.e. lab-01-example is a repo for lab01)
 
 
 # Usage 1
