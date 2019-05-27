@@ -5,28 +5,24 @@ import sys
 import subprocess
 import re
 import argparse
+import os
+#Path of file
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
-#TODO: set correct values
 org='usi-pf2-2019'
-pmd_pos = '/Users/stefano/Desktop/bachelor-project/JavaRules/pmd-bin-6.14.0/bin'
-pos_yaclu = '/Users/stefano/Desktop/bachPF2/pf2-2019-analysis/yaclu'
-root = '/Users/stefano/Desktop/bachPF2/pf2-2019-analysis/student-repos'
-pos_classroom_sh = '/Users/stefano/Desktop/bachPF2/pf2-2019-analysis/classroom-util'
-pos_root_bachelor = '/Users/stefano/Desktop/bachelor-project'
+pmd_pos = '/pmd-bin-6.14.0/bin'
+pos_yaclu = dir_path+ '/yaclu'
+root = dir_path+ '/student-repos'
+pos_classroom_sh = dir_path+ '/classroom-util'
 
-#commands
-checkstyle_cmd = 'echo "repo,checkstyle violation" > checkstyle_violations.csv; for f in lab*; do cd "$f";echo "$f,`mvn checkstyle:check|grep WARN|wc -l`"|cut -c 8- >> ../checkstyle_violations.csv;cd ..; done; say "done";csvlook checkstyle_violations.csv'
-all_reports_cmd = ''
 
 
 parser = argparse.ArgumentParser(description='Use to download and run tests on git repos')
 parser.add_argument('lab', help='the lab to utilise i.e. lab01')
 parser.add_argument('-clone', action='store_true', help='clone the repositories for the lab')
 parser.add_argument('-pull', action='store_true', help='pull the repositories for the lab')
-parser.add_argument('-verify', action='store_true', help='run mvn:verify for the repositories in the lab')
-parser.add_argument('-check', action='store_true', help='run mvn:check for the repositories in the lab')
-parser.add_argument('-report_rules_total', action='store_true', help='create a report with the total of the violation per pmd rule, need -check beforehand')
-parser.add_argument('-print', action='store_true', help='print the results of the report on the terminal (not nice), needs -report_rules_total beforehand')
+parser.add_argument('-check', action='store_true', help='run pmd on the repositories')
+parser.add_argument('-report', action='store_true', help='create a report with the total of the violation per pmd rule, need -check beforehand')
 parser.add_argument('-enablers', action='store_true', help='use jar for enablers')
 args = parser.parse_args()
 
@@ -53,7 +49,7 @@ def run_pmd_check(root,folders):
         else:
             jar = '/RulesEnabler/pmd-examples/pf2_custom_rules_enabler.jar'
             en = 'enablerV'
-        subprocess.run('cd ' + root + '/ ;CLASSPATH=' + pos_root_bachelor + jar +' ' + pmd_pos +'/run.sh pmd -no-cache -f csv -d ' + folder + ' -R myrule.xml -t 8 | grep -v "Test.java" | tee '+root+'/'+folder+ '/' + en + 'iolation.csv >> violation.csv', shell=True);
+        subprocess.run('cd ' + root + '/ ;CLASSPATH=' + pos_root + jar +' ' + pmd_pos +'/run.sh pmd -no-cache -f csv -d ' + folder + ' -R myrule.xml -t 8 | grep -v "Test.java" | tee '+root+'/'+folder+ '/' + en + 'iolation.csv >> violation.csv', shell=True);
 
 def run_pmd_output(root,folders,command):
     out = {};
@@ -112,20 +108,10 @@ if(args.pull):
     print(command);
     subprocess.run(command, shell=True)
 
-if(args.verify):
-    run_pmd(path,subfolders,'mvn verify');
-
-if('-checkstyle' in sys.argv):
-    command = 'cd ' + path + '; ' + checkstyle_cmd;
-    subprocess.run(command, shell=True);
-
 if(args.check):
     run_pmd_check(path,subfolders);
 
-if(args.print):
-    run_pmd(path,subfolders,'echo "\n\n"; pwd;cat pmd_failures');
-
-if(args.report_rules_total):
+if(args.report):
     F = open(path+'/violation.csv','r')
     #already checked student
     done = False
