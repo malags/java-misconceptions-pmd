@@ -30,7 +30,7 @@ vi get-assignment-repos.py
 cd ..
 ```
 
-Edit the `run.py`: script, insert the correct organisation name in the line org='YOUR_ORG_NAME_HERE'
+Edit the `run.py`: script, insert the correct organisation name in the line `org='YOUR_ORG_NAME_HERE'`
 
 ```
 mkdir student-repos
