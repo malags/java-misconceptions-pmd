@@ -14,15 +14,13 @@ On your GitHub account, go to "Developer Settings" and create a "Personal Access
 
 [https://github.com/settings/tokens](https://github.com/settings/tokens)
 
-Create directory structure and get necessary tools (classroom-util and yaclu):
+Get necessary tools (classroom-util and yaclu):
 ```
-mkdir pf2-2019-analysis
-cd pf2-2019-analysis
 git clone https://github.com/geoffryan/classroom-util.git
 git clone git@bitbucket.org:igormoreno/yaclu.git
 ```
 
-Edit the `get-assignment-repos.py` script, put your GitHub personal access token in there (in the line `g = Github(...)`):
+Edit the `get-assignment-repos.py` script in the `yaclu folder`, put your GitHub personal access token in there (in the line `g = Github(...)`):
 
 ```
 cd yaclu
@@ -30,11 +28,7 @@ vi get-assignment-repos.py
 cd ..
 ```
 
-Edit the `run.py`: script, insert the correct organisation name in the line `org='YOUR_ORG_NAME_HERE'`
-
-```
-mkdir student-repos
-```
+Edit the `run.py` script, insert the correct organisation name in the line `org='YOUR_ORG_NAME_HERE'`
 
 # Requirements
 For `run.py` to work there are several requirements:
