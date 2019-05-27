@@ -56,7 +56,7 @@ CLASSPATH=pf2_custom_rules.jar ./pmd-bin-6.14.0/bin/run.sh pmd -no-cache -f text
 ```
 this will run PMD for the target folder, change the CLASSPATH to `pf2_custom_rules_enabler.jar` to run with the enablers
 
-#Flags
+# Flags
 There are several flags, the standard ones are those seen in the Usage section but
 there are more available:
 * -clone    : clone the repos corresponding to the given lab
