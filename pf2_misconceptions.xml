@@ -1,0 +1,594 @@
+<?xml version="1.0"?>
+
+<ruleset name="PF2 misconceptions"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>
+        Common misconceptions found in the pf2 course, or in general in novice programmers.
+    </description>
+
+
+
+    <rule name="NoFloatLiterals"
+          language="java"
+          message="Use float literal instead of casting a literal to float"
+          class="net.sourceforge.pmd.lang.rule.XPathRule"
+          >
+        <description>
+A float literal can be obtained by appending 'f' to the number. i.e. 1.2f
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//CastExpression[
+./Type/PrimitiveType[@Image='float']
+and
+./PrimaryExpression/PrimaryPrefix/Literal[@FloatLiteral = false()]
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+  public class Foo {
+    public void bar() {
+        float f = (float) 123;
+        f = (float) 23;
+        f = (float) (1.5);
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="NoLongLiterals"
+          language="java"
+          message="Use long literal instead of casting a literal to long"
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+A long literal can be obtained by appending 'L' to the number. i.e. 10L
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//CastExpression[
+./Type/PrimitiveType[@Image='long']
+and
+./PrimaryExpression/PrimaryPrefix/Literal[@IntLiteral = true()]
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+  public class Foo {
+    public void bar() {
+        long l = (long) 123;
+        l = (long) 23;
+        l = (long) (12);
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="MapToBooleanWithConditionalOperator"
+          language="java"
+          message="The value from the ternary operator is redundant."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+The ternary operator is unnecessary use the result of a boolean expression instead use.
+i.e.
+boolean mybool = !a;        //instead of mybool = !a      ? true : false;
+boolean mybool = b.bar();   //instead of mybool = b.bar() ? true : false;
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ConditionalExpression[
+    ./Expression/PrimaryExpression/PrimaryPrefix/Literal/BooleanLiteral
+    and
+    ./PrimaryExpression[2]/PrimaryPrefix/Literal/BooleanLiteral
+  ]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+  public void bar() {
+      boolean t1 = a ? true : false;
+      boolean t2 = a ? false : true;
+      boolean t3 = foo() ? false : true;
+
+      if(foo() ? false : true){
+        //do something
+      }
+  }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="ComparisonWithBooleanLiteral"
+          language="java"
+          message="Comparisons with boolean literals are unnecessary."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+A comparison with a boolean literal such as 'bool == true' serves no
+purpose (true == true is true, false == true is false), directly use the value of the variable instead.
+i.e.
+if(bool){
+  //do something
+}
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//Expression[
+  ./EqualityExpression//Literal/BooleanLiteral
+  or
+  ./ConditionalOrExpression//Literal/BooleanLiteral
+  or
+  ./ConditionalAndExpression//Literal/BooleanLiteral
+  or
+  ./ExclusiveOrExpression//Literal/BooleanLiteral
+]
+]]>
+                </value>
+            </property>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+  public void bar() {
+    boolean bool = true;
+
+    //unnecessary comparison with true
+    if(bool == true){
+      //do something
+    }
+
+    //unnecessary comparison with false
+    if(bool != false){
+      //do something
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="MapToBooleanWithIf"
+          language="java"
+          message="Directly utilise the condition to obtain the boolean value needed."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+For a return an if statement is not necessary if we already have a
+boolean expression on which we decide what to return.
+i.e.
+
+public boolean bar(boolean bool){
+  return !bool || foo();
+}
+
+NOT:
+public boolean bar(boolean bool){
+  if(!bool || foo())
+    return true;
+  else
+    return false;
+}
+
+there is also the case to select a value:
+
+boolean b;
+if (CONDITION) {
+  b = true;
+} else {
+  b = false;
+}
+
+the same result could be obtained by using:
+b = CONDITION;
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//IfStatement[count(./Statement) = 2][
+  ./Statement[1][count(./Block/BlockStatement) = 1]//ReturnStatement[
+    .//AllocationExpression/Arguments[(@ArgumentCount = 1) = true()]/ArgumentList/Expression//BooleanLiteral
+    or
+    ./Expression/PrimaryExpression/PrimaryPrefix/Literal/BooleanLiteral
+  ]
+  and
+  ./Statement[2][count(./Block/BlockStatement) = 1]//ReturnStatement[
+    .//AllocationExpression/Arguments[(@ArgumentCount = 1) = true()]/ArgumentList/Expression//BooleanLiteral
+    or
+    ./Expression/PrimaryExpression/PrimaryPrefix/Literal/BooleanLiteral
+  ]
+]|
+//IfStatement[count(./Statement) = 2][
+  ./Statement[1]/Block[count(./BlockStatement) = 1]//StatementExpression[
+    ./AssignmentOperator
+    and
+    ./Expression/PrimaryExpression/PrimaryPrefix/Literal/BooleanLiteral
+  ]
+  and
+  ./Statement[2]/Block[count(./BlockStatement) = 1]//StatementExpression[
+    ./AssignmentOperator
+    and
+    ./Expression/PrimaryExpression/PrimaryPrefix/Literal/BooleanLiteral
+  ]
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="1.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+
+  public boolean bar() {
+    if(false)
+      return false;
+    if(false){
+      return true;
+    }
+    //...
+  }
+
+  public Foo foo(){
+
+    if(false)
+      return new Foo(false);
+
+    if(false){
+      return new Foo(true);
+    }
+
+    //...
+  }
+
+  public Foo foo2(boolean s){
+
+    boolean b;
+    if(!s){
+      b = false;
+    }
+    else{
+      b = true;
+    }
+
+    //...
+  }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="StringLiteralNoObject"
+      language="java"
+      message="Directly utilise the String literal instead of passing it as an argument to a String constructor."
+      class="net.sourceforge.pmd.lang.rule.XPathRule">
+    <description>
+A String can be constructed directly by assigning a String literal to a String reference just as if it were a primitive type (it isn't). i.e. String s = "Hello World";
+    </description>
+    <priority>3</priority>
+    <properties>
+        <property name="xpath">
+            <value>
+<![CDATA[
+//AllocationExpression[
+  ./ClassOrInterfaceType[@Image='String']
+  and
+  ./Arguments/ArgumentList/Expression/PrimaryExpression/PrimaryPrefix/Literal[@StringLiteral = true()]
+]
+]]>
+            </value>
+        </property>
+        <property name="version" value="2.0"/>
+    </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public boolean bar() {
+
+      String s = new String("Hello World");
+
+      s = new String("Hello Again");
+      new String("This too.");
+
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="CharNotNumeric"
+          language="java"
+          message="A char can be utilised as if it were a number."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+A char can be utilised as if it were a number, but to print a char the expression must be of type char.
+i.e.
+System.out.println( 'b' );               // b
+System.out.println( 'a' + 1 );           // 98 (the expression type is int)
+System.out.println( (char) ('a' + 1) );  // b  (the expression type is char)
+System.out.println( (char) ('b' - 1) );  // a  (the expression type is char)
+        </description>
+        <priority>3</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//CastExpression[
+	./Type/PrimitiveType[@Image='int']
+	and
+	./PrimaryExpression/PrimaryPrefix//Literal[@CharLiteral = true()]
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+    <![CDATA[
+public class Foo {
+    public boolean bar() {
+
+      char c = (char) (( (int)'a' ) +2);
+
+      int i = (int) 'i';
+
+    }
+}
+    ]]>
+        </example>
+    </rule>
+
+<!-- only with pmd:check, compilation fails otherwise-->
+    <rule name="LargeIntegerLong"
+          language="java"
+          message="A large integer literal bigger than 32bit is not a Long"
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+A value bigger than the maximal value of int is not represented as long but overflows.
+Use a literal of type long instead
+i.e.
+long l = 1234567876543245678L;
+        </description>
+        <priority>1</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//PrimaryPrefix/Literal[@IntLiteral = true()][
+	@ValueAsDouble > 2147483647 or
+	@ValueAsDouble < -2147483648
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public boolean bar() {
+        long i = 1234567876543245678;
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="ReturnCall"
+          language="java"
+          message="The return statement does not need parenthesis as it is NOT a method."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+The return statement only requires an expression, no parenthesis are needed.
+i.e.
+return 3;
+        </description>
+        <priority>4</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ReturnStatement/Expression/PrimaryExpression/PrimaryPrefix/Expression
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    public boolean bar() {
+        return (true);
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="ThisExistsInStaticMethod"
+          language="java"
+          message=" this only exists in instance methods."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+"this" only exists in instance methods as it the refers to the object on which the
+method is called.
+
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//MethodDeclaration[@Static = true()]//PrimaryPrefix[@ThisModifier = true()]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    int a;
+    public Foo void bar() {
+        this.a = 12;
+        return this;
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="DeferredReturn"
+          language="java"
+          message="A return statement immediately returns."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+When a return statement is reached it immediately return unless inside a try in a
+try{}catch(){}finally{}.
+
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//Block/BlockStatement[position() != last()]/Statement/ReturnStatement
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    int i = 0;
+    public int bar() {
+        return i;
+        i++;
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="ForEachVariableIsElement"
+          language="java"
+          message="The variable of a for-each statement is not an alias for the element, therefore a for-each cannot be used to initialise the elements of an array."
+          class="net.sourceforge.pmd.lang.rule.XPathRule">
+        <description>
+The variable of a for-each statement can be seen as a new variable to which it's
+assigned the value currently in the collection, it's therefore a distinct variable
+not an alias for the variable holding the element.
+
+        </description>
+        <priority>2</priority>
+        <properties>
+            <property name="xpath">
+                <value>
+<![CDATA[
+//ForStatement[
+	  .//LocalVariableDeclaration//VariableDeclaratorId/@Image =
+    .//StatementExpression[ ./AssignmentOperator ]/PrimaryExpression[not(./PrimarySuffix)]//Name/@Image
+  and
+    not( .//LocalVariableDeclaration//VariableInitializer )
+]
+]]>
+                </value>
+            </property>
+            <property name="version" value="2.0"/>
+        </properties>
+        <example>
+<![CDATA[
+public class Foo {
+    int i = 0;
+    public int bar() {
+      Foo[] foos = new Foo[10];
+      for (Foo foo : foos) {
+        foo = new Foo();        //violation
+      }
+
+      int[] ages = new int[10];
+      for (int age : ages) {
+        age = 19;               //violation
+      }
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+<!--
+ArrayHasLengthMethod missing check of array type, use Java rule, this expression returns a Name Node,
+use it to check for declaration in block
+
+//PrimaryExpression[
+./PrimaryPrefix/Name[contains(@Image,'.length')]
+and
+./PrimarySuffix/Arguments[@ArgumentCount = 0]
+]/PrimaryPrefix/Name
+-->
+
+<!-- TODO -->
+<!-- check for assignment instead of comparison (doesn't cover all cases: only assignment of literals)
+//IfStatement/Expression[
+.//AssignmentOperator
+and
+.//Expression[
+	./PrimaryExpression/PrimaryPrefix/Literal
+]
+and
+not(	count(.//EqualityExpression) > 0
+	or
+	count(.//RelationalExpression) > 0
+)
+]
+-->
+
+</ruleset>

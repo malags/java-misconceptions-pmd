@@ -1,0 +1,300 @@
+<?xml version="1.0"?>
+
+<ruleset name="PF2 Java Rules"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <description>
+Common misconceptions found in the pf2 course, or in general in novice programmers. Java rules only.
+    </description>
+
+
+
+    <rule name="ObjectsMustBeNamed"
+          language="java"
+          class="ObjectsMustBeNamed"
+          message="It&apos;s possible to use newly instantiated objects directy without assigning them to a variable.">
+        <description>
+It is possible to use newly instantiated objects directy without assigning them to a variable, use anonymous objects when possible.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public void doSomething() {
+      String foo = new String();
+      foo.length();
+      //foo never used again.
+    }
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="VariableHoldExpression"
+          language="java"
+          class="VariableHoldExpression"
+          message="A variable does not store an expression but a value.">
+        <description>
+During an asssignment the expression on the right is evaluated and assigned as a
+value to the variable on the left.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public int doSomething(int b) {
+      int foo = 2 + b;
+      return foo;
+    }
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="DivisionToFractional"
+          language="java"
+          class="DivisionToFractional"
+          message="A division between two integers produces an integer. i.e. 1/2 == 0">
+        <description>
+A division between two integers produces an integer directly use a double if possible. i.e. 1/2 == 0
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public void doSomething() {
+      int notADouble = 12/3;
+      notADouble = 3/2;
+    }
+]]>
+        </example>
+    </rule>
+
+    <rule name="RecursiveCallSiteNoReturn"
+          language="java"
+          class="RecursiveCallSiteNoReturn"
+          message="A recursive method that has a non-void type always requires at least two return statements as it must always return a value.">
+        <description>
+A method with a non-void type must always return a value.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public int factorial(int n) {
+      if(n <= 1){
+          return 1;
+      }
+      factorial(n-1);
+    }
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="IfRequiresElse"
+          language="java"
+          class="IfRequiresElse"
+          message="An if statement does not require an else statement but can be utilised alone.">
+        <description>
+An if statement doesn't require an else statement but can be utilised alone,
+in case the condition is false the program will proceed as if it was not there.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public class Example{
+
+  int count = 0;
+
+  private void violation1(int v){
+    if (v > 0) {
+      count = count + 1;
+    }
+    else {
+      // else branch is not necessary
+      count = count;
+    }
+  }
+
+  private void violation2(){
+    if (v==value) {
+      count = count + 1;
+    }
+    else {
+      // else branch is not necessary
+    }
+  }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="PrivateFromOtherInstance"
+          language="java"
+          class="PrivateFromOtherInstance"
+          message="Instances of the same class can access each other private fields.">
+        <description>
+Instances of the same class can access each other private fields as long as there
+is a reference.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public class C {
+
+  private int key;
+
+  public int getKey(){
+    return key;
+  }
+
+  public boolean violation(C other) {
+    return this.key == other.getKey();
+  }
+
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="ArrayElementsUntyped"
+          language="java"
+          class="ArrayElementsUntyped"
+          message="The type of the values stored inside an array must be the same as that of the array (i.e. int[] &lt;- int).">
+        <description>
+The values stored inside an array must be of the same type as the array containing them,
+or they must be a subclass or a class implementing the type.
+        </description>
+        <priority>3</priority>
+        <example>
+<![CDATA[
+public class Example {
+
+  void ex(){
+    int[] a = new int[3];
+    a[0] = "Hi"; // type error
+    a[1] = 12;
+    a[2] = 13.5; // type error
+  }
+
+}
+]]>
+        </example>
+    </rule>
+
+    <rule name="ArrayBracketForEachElement"
+          language="java"
+          message="Brackets in array initializations are used to set the size not the value, detected non-matching size for initialization."
+          class="ArrayBracketForEachElement">
+        <description>
+The brackets in an array initializations set the size of the array if we want to
+set a value we have to use different methods.
+i.e.
+int[]   a = new int[3];    //declare an array and set it's size to 3
+int[][] b = new int[3][3]; //declare an array of arrays, where there are three elements in the first array and every element is an array of size 3.
+int[]   c = {1,2,3};       //declare an array of size 3, with values c[0]=1,c[1]=2,c[2]=3
+
+
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public class Foo {
+    public void bar() {
+        int [] a = new int[1][2][3][4][5];
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="LocalVariablesAutoInitialized"
+          language="java"
+          message="Local variables need to be initialised before use."
+          class="LocalVariablesAutoInitialized">
+        <description>
+A local variable must be initialised before utilisation as they, unlike fields,
+don't have a default value.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public class Foo {
+    public void bar() {
+        int a;
+        int b = a + 1;
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule name="ArrayListIsArray"
+          language="java"
+          message="An ArrayList is NOT an array, it is not possible to initialise an ArrayList with an Array."
+          class="ArrayListIsArray">
+        <description>
+An ArrayList is an object with different type and behaviour from an an array, for this
+reasons it is not possible to initialise an ArrayList with an array.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+import java.util.ArrayList;
+public class Foo {
+    public void bar() {
+       ArrayList<Integer> asd = new Integer[3];             //violation
+       int[][] a = new ArrayList<ArrayList<Integer>>();     //violation
+
+       ArrayList<String> arL = new ArrayList<String>();
+       arL[0] = "Hi";                                       //violation
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+    <rule name="ArrayHasLengthMethod"
+          language="java"
+          message="An array does not have any method that return its size, but it has a public field length containg it."
+          class="ArrayHasLengthMethod">
+        <description>
+An array has a public field length containg the length of the array, it doesn't
+have any method to retrieve the length.
+        </description>
+        <priority>1</priority>
+        <example>
+<![CDATA[
+public class Foo {
+    private void violation1(){
+        int a[] = new int[2];
+        a[0] = 1;
+        a[1] = a.length();          //violation
+    }
+
+    private void violation2(){
+        int a[] = new int[2];
+        a[0] = 1;
+        a[1] = a.size();            //violation
+    }
+}
+]]>
+        </example>
+    </rule>
+
+
+
+    <rule ref="pf2_misconceptions.xml"/>
+
+</ruleset>
