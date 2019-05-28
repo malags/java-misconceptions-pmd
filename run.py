@@ -128,7 +128,7 @@ if(args.report):
         pieces = line.split(',')
         if(len(pieces) < 7):
             continue
-        rule_name = pieces[7]
+        rule_name = pieces[-1]
         if 'Test.java' in line:
             continue
         if rule_name == '"Rule"\n':
