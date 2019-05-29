@@ -220,13 +220,13 @@ b = CONDITION;
                 <value>
 <![CDATA[
 //IfStatement[count(./Statement) = 2][
-  ./Statement[1][count(./Block/BlockStatement) = 1]//ReturnStatement[
+  ./Statement[1][count(./Block/BlockStatement) = 1]/Block/BlockStatement/Statement/ReturnStatement[
     .//AllocationExpression/Arguments[(@ArgumentCount = 1) = true()]/ArgumentList/Expression//BooleanLiteral
     or
     ./Expression/PrimaryExpression/PrimaryPrefix/Literal/BooleanLiteral
   ]
   and
-  ./Statement[2][count(./Block/BlockStatement) = 1]//ReturnStatement[
+  ./Statement[2][count(./Block/BlockStatement) = 1]/Block/BlockStatement/Statement/ReturnStatement[
     .//AllocationExpression/Arguments[(@ArgumentCount = 1) = true()]/ArgumentList/Expression//BooleanLiteral
     or
     ./Expression/PrimaryExpression/PrimaryPrefix/Literal/BooleanLiteral
