@@ -30,6 +30,12 @@ cd ..
 
 Edit the `run.py` script, insert the correct organisation name in the line `org='YOUR_ORG_NAME_HERE'`
 
+Run
+```
+./compile_rules.sh
+```
+in this project folder.
+
 # Requirements
 For `run.py` to work there are several requirements:
 * A Github organisation (for clone and pull functionality)

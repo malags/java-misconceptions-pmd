@@ -220,13 +220,13 @@ b = CONDITION;
                 <value>
 <![CDATA[
 //IfStatement[count(./Statement) = 2][
-  ./Statement[1][count(./Block/BlockStatement) = 1]//ReturnStatement[
+  ./Statement[1][count(./Block/BlockStatement) = 1]/Block/BlockStatement/Statement/ReturnStatement[
     .//AllocationExpression/Arguments[(@ArgumentCount = 1) = true()]/ArgumentList/Expression//BooleanLiteral
     or
     ./Expression/PrimaryExpression/PrimaryPrefix/Literal/BooleanLiteral
   ]
   and
-  ./Statement[2][count(./Block/BlockStatement) = 1]//ReturnStatement[
+  ./Statement[2][count(./Block/BlockStatement) = 1]/Block/BlockStatement/Statement/ReturnStatement[
     .//AllocationExpression/Arguments[(@ArgumentCount = 1) = true()]/ArgumentList/Expression//BooleanLiteral
     or
     ./Expression/PrimaryExpression/PrimaryPrefix/Literal/BooleanLiteral
@@ -563,32 +563,5 @@ public class Foo {
         </example>
     </rule>
 
-
-<!--
-ArrayHasLengthMethod missing check of array type, use Java rule, this expression returns a Name Node,
-use it to check for declaration in block
-
-//PrimaryExpression[
-./PrimaryPrefix/Name[contains(@Image,'.length')]
-and
-./PrimarySuffix/Arguments[@ArgumentCount = 0]
-]/PrimaryPrefix/Name
--->
-
-<!-- TODO -->
-<!-- check for assignment instead of comparison (doesn't cover all cases: only assignment of literals)
-//IfStatement/Expression[
-.//AssignmentOperator
-and
-.//Expression[
-	./PrimaryExpression/PrimaryPrefix/Literal
-]
-and
-not(	count(.//EqualityExpression) > 0
-	or
-	count(.//RelationalExpression) > 0
-)
-]
--->
 
 </ruleset>

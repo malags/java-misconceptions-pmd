@@ -1,8 +1,11 @@
 import net.sourceforge.pmd.lang.java.ast.ASTMethodDeclaration;
+import net.sourceforge.pmd.lang.java.ast.ASTMethodDeclarator;
 import net.sourceforge.pmd.lang.java.ast.ASTReturnStatement;
 import net.sourceforge.pmd.lang.java.ast.ASTName;
 import net.sourceforge.pmd.lang.java.rule.AbstractJavaRule;
 import java.util.List;
+import net.sourceforge.pmd.lang.ast.Node;
+import org.jaxen.JaxenException;
 
 public class EnablerRecursiveCallSiteNoReturn extends AbstractJavaRule {
 
@@ -22,15 +25,29 @@ public class EnablerRecursiveCallSiteNoReturn extends AbstractJavaRule {
     }
 
     private boolean isDirectlyRecursive(ASTMethodDeclaration node){
-      //getMethodName
-      String name = node.getName();
-      List<ASTName> names = node.findDescendantsOfType(ASTName.class);
-      for(ASTName n : names)
-          if(n.getImage().equals(name))
-              return true;
 
-      //should also check indirectly recursive
-      return false;
+      //get ArgumentCount (deals with overloading)
+      int argCount;
+      try{
+        List<Node> dec = node.findChildNodesWithXPath​("./MethodDeclarator");
+        if(dec.size() == 0)
+          return false;
+        argCount = ((ASTMethodDeclarator)dec.get(0)).getParameterCount();
+        System.out.println(argCount);
+        //getMethodName
+        String name = node.getName();
+
+        List<Node> uses = node.findChildNodesWithXPath(".//PrimaryExpression[./PrimaryPrefix/Name[@Image = '"+name+"'] and ./PrimarySuffix[@ArgumentCount = "+argCount+"] ]");
+        if(uses.size() != 0)
+          return true;
+
+        //should also check indirectly recursive
+        return false;
+
+      }
+      catch(JaxenException e){
+        return false;
+      }
     }
 
     private int numberOfReturns(ASTMethodDeclaration node){

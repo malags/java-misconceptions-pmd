@@ -54,7 +54,7 @@ public class LocalVariablesAutoInitialized extends AbstractJavaRule{
             }
 
             //check for . cases
-            usesName = node.findChildNodesWithXPath(".//PrimaryPrefix/Name[fn:contains(fn:substring-before(@Image,'.'),'"+name+"')]");
+            usesName = node.findChildNodesWithXPath(".//PrimaryPrefix/Name[fn:substring-before(@Image,'.') = '"+name+"']");
             if(usesName.size() == 0)
               continue;
 

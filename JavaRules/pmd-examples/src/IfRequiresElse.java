@@ -19,7 +19,7 @@ public class IfRequiresElse extends AbstractJavaRule {
 
         try{
           //take second statement
-          List<Node> statements = node.findChildNodesWithXPath("./Statement[2]");
+          List<Node> statements = node.findChildNodesWithXPath("./Statement[2][not(./IfStatement)]");
 
           //should have exactly 1 result
           if(statements.size() != 1)

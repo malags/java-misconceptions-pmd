@@ -778,9 +778,7 @@ A division between two integers produces an integer. i.e. 1/2 == 0
             <property name="xpath">
                 <value>
 <![CDATA[
-//MultiplicativeExpression[@Image='/'][
-count(.//Literal[@IntLiteral = true()]) = 2
-]
+//MultiplicativeExpression[@Image='/'][pmd-java:typeIs('int')]
 ]]>
                 </value>
             </property>
