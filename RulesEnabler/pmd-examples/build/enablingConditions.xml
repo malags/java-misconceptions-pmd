@@ -766,10 +766,10 @@ public double doSomething(int v) {
 
 
 
-    <rule name="EnablerDivisionToFractional"
+    <rule name="EnablerIntegerDivisionToRational"
           language="java"
           class="net.sourceforge.pmd.lang.rule.XPathRule"
-          message="Check whether the rule DivisionToFractional could detect a violation.">
+          message="Check whether the rule IntegerDivisionToRational could detect a violation.">
         <description>
 A division between two integers produces an integer. i.e. 1/2 == 0
         </description>

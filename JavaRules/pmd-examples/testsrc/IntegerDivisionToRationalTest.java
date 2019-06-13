@@ -1,4 +1,4 @@
-public class DivisionToFractionalTest {
+public class IntegerDivisionToRationalTest {
     private String foo;
 
     private double violation1(){

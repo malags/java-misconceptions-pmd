@@ -53,12 +53,12 @@ public int doSomething(int b) {
 
 
 
-    <rule name="DivisionToFractional"
+    <rule name="IntegerDivisionToRational"
           language="java"
-          class="DivisionToFractional"
+          class="IntegerDivisionToRational"
           message="A division between two integers produces an integer. i.e. 1/2 == 0">
         <description>
-A division between two integers produces an integer directly use a double if possible. i.e. 1/2 == 0
+A division between two integers produces an integer, directly use a double if possible. i.e. 1/2 == 0
         </description>
         <priority>3</priority>
         <example>

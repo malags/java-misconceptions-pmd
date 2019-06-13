@@ -12,7 +12,7 @@ import net.sourceforge.pmd.lang.java.rule.AbstractJavaRule;
 import java.util.List;
 
 
-public class DivisionToFractional extends AbstractJavaRule{
+public class IntegerDivisionToRational extends AbstractJavaRule{
     @Override
     public Object visit(ASTBlockStatement node, Object data) {
         boolean keep = node.hasDescendantOfType​(ASTAssignmentOperator.class) ||
